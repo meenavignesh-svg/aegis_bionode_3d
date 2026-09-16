@@ -1,413 +1,69 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AEGIS Bio-Node — Gyroid Perfusion Bioreactor</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AEGIS Bio-Node | Adaptive Perfusion Cartridge</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
-  canvas { display: block; }
-  #label {
-    position: fixed; bottom: 28px; left: 0; right: 0;
-    text-align: center; color: #555; font-size: 11px;
-    letter-spacing: 5px; text-transform: uppercase;
-    pointer-events: none; user-select: none; z-index: 2;
-  }
-  #label span { color: #bbb; font-weight: bold; }
-  #hint {
-    position: fixed; bottom: 10px; left: 0; right: 0;
-    text-align: center; color: #333; font-size: 9px;
-    letter-spacing: 3px; text-transform: uppercase;
-    pointer-events: none; user-select: none; z-index: 2;
-  }
-  #loading {
-    position: fixed; inset: 0; display: flex; align-items: center;
-    justify-content: center; background: #000; z-index: 10;
-    color: #444; font-size: 12px; letter-spacing: 4px;
-    text-transform: uppercase; transition: opacity 1s;
-  }
-  #loading.hide { opacity: 0; pointer-events: none; }
+:root{--bg:#071014;--panel:rgba(9,20,24,.88);--line:#31525a;--text:#d9eef0;--muted:#7fa0a5;--cyan:#52e3e8;--green:#8dffbd;--amber:#ffd27a}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:Inter,system-ui,Segoe UI,sans-serif;color:var(--text)}
+#app{position:fixed;inset:0}canvas{display:block;width:100%;height:100%}
+.hud{position:fixed;z-index:3;pointer-events:none}.top{top:18px;left:18px}.brand{font-size:19px;font-weight:800;letter-spacing:.18em}.sub{margin-top:5px;color:var(--muted);font-size:10px;letter-spacing:.16em;text-transform:uppercase}.badge{display:inline-block;margin-top:10px;padding:5px 8px;border:1px solid #805f2b;border-radius:5px;color:var(--amber);font-size:9px;letter-spacing:.12em;background:rgba(70,45,10,.25)}
+.panel{position:fixed;z-index:4;right:18px;top:18px;width:270px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);backdrop-filter:blur(12px);box-shadow:0 18px 50px rgba(0,0,0,.35)}.panel h2{margin:0 0 10px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#a9c6ca}.zone{padding:9px 0;border-top:1px solid #20363b;cursor:pointer}.zone:first-of-type{border-top:0}.row{display:flex;justify-content:space-between;gap:10px;font-size:11px}.row b{color:var(--cyan)}.bar{height:3px;margin-top:7px;background:#16282d;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--cyan);border-radius:9px}.controls{margin-top:10px;padding-top:10px;border-top:1px solid #20363b;font-size:10px;color:var(--muted);line-height:1.55}.controls button{pointer-events:auto;margin:3px 4px 0 0;padding:6px 8px;background:#0d2025;border:1px solid #31525a;border-radius:6px;color:#bfecef;cursor:pointer}.controls button:hover{border-color:var(--cyan)}
+.legend{position:fixed;left:18px;bottom:18px;z-index:4;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:rgba(7,16,20,.82);font-size:9px;color:var(--muted);line-height:1.8}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;background:var(--cyan)}.dot.g{background:var(--green)}
+#tooltip{position:fixed;z-index:6;display:none;padding:8px 10px;border:1px solid #3b6970;border-radius:7px;background:#071519;color:#dffcff;font-size:10px;pointer-events:none}.footer{position:fixed;z-index:4;right:18px;bottom:18px;color:#6f898e;font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+@media(max-width:700px){.panel{width:220px;right:10px;top:10px}.top{left:10px;top:10px}.brand{font-size:15px}.legend{left:10px;bottom:10px}.footer{display:none}.panel .zone{padding:6px 0}}
 </style>
-  <meta property="og:image" content="https://bolt.new/static/og_default.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
 </head>
 <body>
-<div id="loading">Initializing AEGIS Bio-Node</div>
-<div id="label"><span>AEGIS Bio-Node</span> &nbsp;&middot;&nbsp; Intelligent Gyroid Perfusion Bioreactor</div>
-<div id="hint">Drag to rotate &middot; Auto-orbit active</div>
-
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
-  }
-}
-</script>
-
+<div id="app"></div>
+<div class="hud top"><div class="brand">AEGIS BIO-NODE</div><div class="sub">Adaptive sterile perfusion cartridge · technical concept</div><div class="badge">CONCEPTUAL · NOT EXPERIMENTALLY VALIDATED</div></div>
+<div class="panel">
+<h2>Spatial control architecture</h2>
+<div id="zones"></div>
+<div class="controls">FLOW PATH: inlet manifold → zone restrictors → graded gyroid cores → outlet manifold<br><button id="toggle">Pause flow</button><button id="reset">Reset view</button></div>
+</div>
+<div class="legend"><div><span class="dot"></span>Perfusion path</div><div><span class="dot g"></span>Sensor interface</div><div>Drag: rotate · Wheel: zoom · Tap zone: inspect</div></div>
+<div class="footer">AEGIS / engineering visualization / no performance claims</div><div id="tooltip"></div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from 'three';
-
-/* ------------------------------------------------------------------ */
-/*  Renderer                                                           */
-/* ------------------------------------------------------------------ */
-const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
-document.body.appendChild(renderer.domElement);
-
-const scene = new THREE.Scene();
-const camera = new THREE.Camera();
-
-/* ------------------------------------------------------------------ */
-/*  Full-screen raymarching shader                                     */
-/* ------------------------------------------------------------------ */
-const vertexShader = /* glsl */`
-  void main() { gl_Position = vec4(position, 1.0); }
-`;
-
-const fragmentShader = /* glsl */`
-  precision highp float;
-
-  uniform vec2  uResolution;
-  uniform float uTime;
-  uniform vec2  uMouse;
-  uniform float uMouseBlend;
-
-  #define PI            3.14159265359
-  #define MAX_STEPS     128
-  #define MAX_DIST      25.0
-  #define SURF_DIST     0.0012
-
-  /* ---------- SDF primitives ---------- */
-  float gyroid(vec3 p) {
-    return sin(p.x) * cos(p.y)
-         + sin(p.y) * cos(p.z)
-         + sin(p.z) * cos(p.x);
-  }
-
-  float sdCylinder(vec3 p, float r, float h) {
-    vec2 d = vec2(length(p.xz) - r, abs(p.y) - h);
-    return min(max(d.x, d.y), 0.0) + length(max(d, 0.0));
-  }
-
-  float sdTorus(vec3 p, float R, float r) {
-    vec2 q = vec2(length(p.xz) - R, p.y);
-    return length(q) - r;
-  }
-
-  float sdSphere(vec3 p, float r) { return length(p) - r; }
-
-  /* ---------- Scene map with material ID ---------- */
-  float map(vec3 p, out float matID) {
-    matID = 0.0;
-
-    /* --- Gyroid lattice core (bounded to a sphere) --- */
-    vec3 q = p * 2.6;
-    float thickness = 0.030 + 0.010 * sin(uTime * 0.7 + p.y * 2.2 + p.x * 1.5);
-    float g = abs(gyroid(q)) - thickness;
-    float sphere = sdSphere(p, 1.20);
-    float core = max(g, sphere);
-
-    /* --- Inner glow sphere (slightly smaller, used for backlight) --- */
-    float innerGlow = sdSphere(p, 1.18);
-
-    /* --- Base plate --- */
-    float plate = sdCylinder(vec3(p.x, p.y + 1.45, p.z), 1.55, 0.10);
-
-    /* --- Bottom ring collar --- */
-    float botRing = sdTorus(vec3(p.x, p.y + 1.30, p.z), 1.20, 0.035);
-
-    /* --- Top ring collar --- */
-    float topRing = sdTorus(vec3(p.x, p.y - 1.25, p.z), 1.20, 0.035);
-
-    /* --- Sensor ports (6 around the base) --- */
-    float ports = 1e10;
-    for (int i = 0; i < 6; i++) {
-      float a = float(i) * PI / 3.0 + 0.3;
-      vec3  pos = vec3(p.x - cos(a) * 1.42, p.y + 1.25, p.z - sin(a) * 1.42);
-      ports = min(ports, sdCylinder(pos, 0.085, 0.16));
-    }
-
-    /* --- Combine: find closest surface and tag material --- */
-    float result = core;
-
-    if (plate   < result) { result = plate;   matID = 1.0; }
-    if (botRing < result) { result = botRing; matID = 1.0; }
-    if (topRing < result) { result = topRing; matID = 1.0; }
-    if (ports   < result) { result = ports;   matID = 2.0; }
-
-    return result;
-  }
-
-  /* ---------- Normal via central differences ---------- */
-  vec3 calcNormal(vec3 p) {
-    float dummy;
-    vec2 e = vec2(0.0009, 0.0);
-    return normalize(vec3(
-      map(p + e.xyy, dummy) - map(p - e.xyy, dummy),
-      map(p + e.yxy, dummy) - map(p - e.yxy, dummy),
-      map(p + e.yyx, dummy) - map(p - e.yyx, dummy)
-    ));
-  }
-
-  /* ---------- Soft shadow ---------- */
-  float softShadow(vec3 ro, vec3 rd, float mint, float maxt, float k) {
-    float dummy;
-    float res = 1.0;
-    float t = mint;
-    for (int i = 0; i < 32; i++) {
-      vec3  p = ro + rd * t;
-      float h = map(p, dummy);
-      if (h < 0.001) return 0.0;
-      res = min(res, k * h / t);
-      t += clamp(h, 0.02, 0.25);
-      if (t > maxt) break;
-    }
-    return clamp(res, 0.0, 1.0);
-  }
-
-  /* ---------- Ambient occlusion ---------- */
-  float calcAO(vec3 p, vec3 n) {
-    float dummy;
-    float occ = 0.0;
-    float sca = 1.0;
-    for (int i = 0; i < 5; i++) {
-      float h = 0.012 + 0.028 * float(i);
-      float d = map(p + n * h, dummy);
-      occ += (h - d) * sca;
-      sca *= 0.82;
-    }
-    return clamp(1.0 - 1.6 * occ, 0.0, 1.0);
-  }
-
-  /* ---------- Camera ---------- */
-  void getCamera(out vec3 ro, out vec3 rd, vec2 uv) {
-    float autoAngle = uTime * 0.12;
-    float userAngle = uMouse.x * 3.5;
-    float angle = mix(autoAngle, userAngle, uMouseBlend);
-
-    float yOff = mix(0.4, uMouse.y * 2.5 + 0.4, uMouseBlend);
-    float dist  = 4.2;
-
-    ro = vec3(cos(angle) * dist, yOff, sin(angle) * dist);
-    vec3 ta = vec3(0.0, -0.15, 0.0);
-
-    vec3 ww = normalize(ta - ro);
-    vec3 uu = normalize(cross(ww, vec3(0.0, 1.0, 0.0)));
-    vec3 vv = cross(uu, ww);
-    rd = normalize(uv.x * uu + uv.y * vv + 1.8 * ww);
-  }
-
-  /* ---------- Main ---------- */
-  void main() {
-    vec2 uv = (gl_FragCoord.xy - 0.5 * uResolution) / min(uResolution.x, uResolution.y);
-
-    vec3 ro, rd;
-    getCamera(ro, rd, uv);
-
-    /* --- Raymarch --- */
-    float t = 0.05;
-    float matID = 0.0;
-    bool  hit   = false;
-
-    for (int i = 0; i < MAX_STEPS; i++) {
-      vec3 p = ro + rd * t;
-      float d = map(p, matID);
-      if (d < SURF_DIST) { hit = true; break; }
-      if (t > MAX_DIST) break;
-      t += d * 0.75;
-    }
-
-    float gray = 0.0;
-
-    if (hit) {
-      vec3 p = ro + rd * t;
-      vec3 n = calcNormal(p);
-      vec3 v = -rd;
-
-      /* --- Three-point lighting (all grayscale) --- */
-      vec3 L1 = normalize(vec3( 0.6,  0.8,  0.4));   // key
-      vec3 L2 = normalize(vec3(-0.5,  0.4, -0.6));   // fill
-      vec3 L3 = normalize(vec3( 0.0, -0.4,  0.8));   // back/bounce
-
-      float d1 = max(dot(n, L1), 0.0);
-      float d2 = max(dot(n, L2), 0.0);
-      float d3 = max(dot(n, L3), 0.0);
-
-      /* specular on key light */
-      vec3  h1  = normalize(L1 + v);
-      float sp1 = pow(max(dot(n, h1), 0.0), 40.0);
-
-      float ao     = calcAO(p, n);
-      float shadow = softShadow(p + n * 0.01, L1, 0.02, 6.0, 10.0);
-
-      float fresnel = pow(1.0 - max(dot(n, v), 0.0), 4.0);
-
-      if (matID < 0.5) {
-        /* ---- Gyroid core: bright, luminous, translucent feel ---- */
-        gray = 0.10 + d1 * 0.55 * shadow + d2 * 0.22 + d3 * 0.08;
-        gray += sp1 * 0.28 * shadow;
-        gray += fresnel * 0.35;
-
-        /* subtle internal pulse — "flowing media" */
-        float pulse = 0.04 * sin(uTime * 1.4 + p.y * 4.0 + p.x * 3.0 + p.z * 2.5);
-        gray += pulse;
-        gray += fresnel * pulse * 2.0;
-
-      } else if (matID < 1.5) {
-        /* ---- Housing / rings: dark matte polymer ---- */
-        gray = 0.04 + d1 * 0.10 * shadow + d2 * 0.05 + d3 * 0.03;
-        gray += sp1 * 0.06;
-        gray += fresnel * 0.08;
-
-      } else {
-        /* ---- Sensor ports: metallic, brighter ---- */
-        gray = 0.18 + d1 * 0.38 * shadow + d2 * 0.12 + d3 * 0.05;
-        gray += sp1 * 0.45;
-        gray += fresnel * 0.15;
-      }
-
-      gray *= ao;
-    }
-
-    /* --- Atmospheric fog --- */
-    float fog = 1.0 / (1.0 + t * t * 0.018);
-    gray *= fog;
-
-    /* --- Depth-of-field fake (blur far details) --- */
-    float dof = smoothstep(2.5, 6.0, t);
-    gray = mix(gray, gray * 0.7, dof * 0.4);
-
-    /* --- Vignette --- */
-    float vig = 1.0 - 0.40 * dot(uv, uv);
-    gray *= vig;
-
-    /* --- Film grain --- */
-    float grain = fract(sin(dot(gl_FragCoord.xy + uTime, vec2(12.9898, 78.233))) * 43758.5453);
-    gray += (grain - 0.5) * 0.025;
-
-    /* --- Subtle background gradient --- */
-    if (!hit) {
-      float bgGrad = 1.0 - length(uv) * 0.6;
-      gray = bgGrad * 0.025;
-    }
-
-    gray = clamp(gray, 0.0, 1.0);
-    gl_FragColor = vec4(vec3(gray), 1.0);
-  }
-`;
-
-/* ------------------------------------------------------------------ */
-/*  Shader material                                                    */
-/* ------------------------------------------------------------------ */
-const material = new THREE.ShaderMaterial({
-  vertexShader,
-  fragmentShader,
-  uniforms: {
-    uResolution:  { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-    uTime:        { value: 0 },
-    uMouse:       { value: new THREE.Vector2(0, 0) },
-    uMouseBlend:  { value: 0 },
-  },
-});
-
-const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
-scene.add(quad);
-
-/* ------------------------------------------------------------------ */
-/*  Interaction — drag to orbit, release returns to auto-orbit         */
-/* ------------------------------------------------------------------ */
-const mouseTarget = new THREE.Vector2(0, 0);
-const mouse       = new THREE.Vector2(0, 0);
-let   dragging     = false;
-let   idleTimer    = 0;
-
-function pointerDown(x, y) {
-  dragging = true;
-  idleTimer = 0;
-  pointerMove(x, y);
-}
-function pointerMove(x, y) {
-  if (dragging) {
-    mouseTarget.x = (x / window.innerWidth - 0.5) * 2;
-    mouseTarget.y = -(y / window.innerHeight - 0.5) * 2;
-  }
-}
-function pointerUp() {
-  dragging = false;
-  idleTimer = 0;
-}
-
-window.addEventListener('mousedown', (e) => pointerDown(e.clientX, e.clientY));
-window.addEventListener('mousemove', (e) => pointerMove(e.clientX, e.clientY));
-window.addEventListener('mouseup',   pointerUp);
-window.addEventListener('mouseleave',pointerUp);
-
-window.addEventListener('touchstart', (e) => {
-  if (e.touches.length) pointerDown(e.touches[0].clientX, e.touches[0].clientY);
-}, { passive: true });
-window.addEventListener('touchmove', (e) => {
-  if (e.touches.length) pointerMove(e.touches[0].clientX, e.touches[0].clientY);
-}, { passive: true });
-window.addEventListener('touchend', pointerUp);
-
-/* ------------------------------------------------------------------ */
-/*  Resize                                                             */
-/* ------------------------------------------------------------------ */
-window.addEventListener('resize', () => {
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  material.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
-});
-
-/* ------------------------------------------------------------------ */
-/*  Animation loop                                                     */
-/* ------------------------------------------------------------------ */
-const clock = new THREE.Clock();
-let firstFrame = true;
-
-function animate() {
-  requestAnimationFrame(animate);
-  const elapsed = clock.getElapsedTime();
-  const dt = clock.getDelta();
-
-  material.uniforms.uTime.value = elapsed;
-
-  /* smooth mouse */
-  mouse.x += (mouseTarget.x - mouse.x) * 0.06;
-  mouse.y += (mouseTarget.y - mouse.y) * 0.06;
-  material.uniforms.uMouse.value.copy(mouse);
-
-  /* blend between auto-orbit and user control */
-  if (dragging) {
-    idleTimer = 0;
-    material.uniforms.uMouseBlend.value +=
-      (1.0 - material.uniforms.uMouseBlend.value) * 0.08;
-  } else {
-    idleTimer += dt;
-    if (idleTimer > 2.5) {
-      material.uniforms.uMouseBlend.value +=
-        (0.0 - material.uniforms.uMouseBlend.value) * 0.02;
-      /* gradually return mouse to neutral */
-      mouseTarget.x *= 0.98;
-      mouseTarget.y *= 0.98;
-    }
-  }
-
-  renderer.render(scene, camera);
-
-  if (firstFrame) {
-    firstFrame = false;
-    const el = document.getElementById('loading');
-    if (el) {
-      el.classList.add('hide');
-      setTimeout(() => el.remove(), 1200);
-    }
-  }
-}
-
-animate();
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x071014);scene.fog=new THREE.Fog(0x071014,8,18);
+const camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.05,40);camera.position.set(5.8,4.2,7.2);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;document.getElementById('app').appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.minDistance=4;controls.maxDistance=12;controls.target.set(0,.15,0);
+scene.add(new THREE.HemisphereLight(0x9ddfe5,0x081014,2.0));const key=new THREE.DirectionalLight(0xb8ffff,3);key.position.set(4,7,5);scene.add(key);
+const root=new THREE.Group();scene.add(root);
+const matShell=new THREE.MeshStandardMaterial({color:0x173138,metalness:.55,roughness:.3,transparent:true,opacity:.26,side:THREE.DoubleSide});
+const matFrame=new THREE.MeshStandardMaterial({color:0x274850,metalness:.75,roughness:.25});
+const matCore=new THREE.MeshStandardMaterial({color:0x286a72,metalness:.15,roughness:.38,transparent:true,opacity:.82,emissive:0x082b30,emissiveIntensity:.7});
+const matFlow=new THREE.MeshBasicMaterial({color:0x52e3e8});const matSensor=new THREE.MeshStandardMaterial({color:0x8dffbd,metalness:.4,roughness:.2,emissive:0x123d2b,emissiveIntensity:.8});
+const matValve=new THREE.MeshStandardMaterial({color:0xffb85c,metalness:.7,roughness:.25});
+// transparent chamber
+const chamber=new THREE.Mesh(new THREE.CylinderGeometry(1.55,1.55,4.7,64,1,true),matShell);chamber.position.y=.1;root.add(chamber);
+for(const y of [-2.25,-1.1,0.05,1.2,2.35]){const r=new THREE.Mesh(new THREE.TorusGeometry(1.55,.055,10,64),matFrame);r.rotation.x=Math.PI/2;r.position.y=y;root.add(r)}
+// four spatially distinct graded gyroid zones
+const zones=[];const zoneYs=[-1.55,-.52,.52,1.55];
+function gyroidGeometry(y,scale,phase){const pts=[];const seg=190;for(let i=0;i<seg;i++){const t=i/(seg-1);const yy=-.39+t*.78;const rad=.82*(.72+.28*Math.sin(t*Math.PI));for(let j=0;j<28;j++){const a=j/28*Math.PI*2+phase;const x=Math.cos(a)*rad*(.9+.1*Math.sin(t*9));const z=Math.sin(a)*rad*(.9+.1*Math.cos(t*8));pts.push(x,yy*scale,z)}}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));return g}
+zoneYs.forEach((y,i)=>{const g=gyroidGeometry(y,1, i*.55);const m=new THREE.LineBasicMaterial({color:0x4cced5,transparent:true,opacity:.42});const lines=new THREE.LineSegments(g,m);lines.position.y=y;root.add(lines);const ring=new THREE.Mesh(new THREE.TorusGeometry(.98,.035,8,48),matFrame);ring.rotation.x=Math.PI/2;ring.position.y=y-.42;root.add(ring);zones.push({y,lines,flow:.55+i*.08,sensor:i%2?'pH':'O₂'})});
+// inlet/outlet manifolds on opposite sides
+function pipe(a,b,r=.09,mat=matFlow){const d=new THREE.Vector3().subVectors(b,a);const mid=new THREE.Vector3().addVectors(a,b).multiplyScalar(.5);const mesh=new THREE.Mesh(new THREE.CylinderGeometry(r,r,d.length(),16),mat);mesh.position.copy(mid);mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());root.add(mesh);return mesh}
+const inlet=new THREE.Vector3(-2.5,-1.55,0), outlet=new THREE.Vector3(2.5,1.55,0);pipe(inlet,new THREE.Vector3(-1.05,-1.55,0),.13,matFrame);pipe(new THREE.Vector3(1.05,1.55,0),outlet,.13,matFrame);
+// vertical manifolds and zone restrictors
+pipe(new THREE.Vector3(-1.05,-1.55,0),new THREE.Vector3(-1.05,1.55,0),.12,matFrame);pipe(new THREE.Vector3(1.05,-1.55,0),new THREE.Vector3(1.05,1.55,0),.12,matFrame);
+zones.forEach((z,i)=>{pipe(new THREE.Vector3(-1.05,z.y,0),new THREE.Vector3(-.78,z.y,0),.07,matFrame);pipe(new THREE.Vector3(.78,z.y,0),new THREE.Vector3(1.05,z.y,0),.07,matFrame);const v=new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,.08,20),matValve);v.rotation.z=Math.PI/2;v.position.set(-.92,z.y,0);root.add(v);z.valve=v});
+// sealed replaceable optical sensor cassette at front
+const cassette=new THREE.Mesh(new THREE.BoxGeometry(.55,2.9,.12),new THREE.MeshStandardMaterial({color:0x193e42,metalness:.5,roughness:.2,transparent:true,opacity:.9}));cassette.position.set(0,0,1.45);root.add(cassette);
+for(let i=0;i<4;i++){const s=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,.15,18),matSensor);s.rotation.x=Math.PI/2;s.position.set(0,zoneYs[i],1.53);root.add(s);zones[i].sensor=s}
+// flow particles travel through the complete architecture
+const particleGeo=new THREE.SphereGeometry(.035,8,8);const particles=[];for(let i=0;i<70;i++){const p=new THREE.Mesh(particleGeo,matFlow);p.userData.t=Math.random();p.userData.offset=(Math.random()-.5)*.13;root.add(p);particles.push(p)}
+function flowPoint(t,offset){const stages=[0,.16,.3,.7,.84,1];let y;if(t<.16){y=-1.55}else if(t<.3){y=-1.55+(t-.16)/.14*3.1}else if(t<.7){const q=(t-.3)/.4;const idx=Math.min(3,Math.floor(q*4));const local=q*4-idx;y=zoneYs[idx]*(1-local)+zoneYs[Math.min(3,idx+1)]*local}else if(t<.84){y=1.55}else y=1.55;let x;if(t<.16)x=-2.5+(t/.16)*1.45;else if(t<.3)x=-1.05;else if(t<.7)x=-.78;else if(t<.84)x=1.05;else x=1.05+(t-.84)/.16*1.45;const z=(t>.3&&t<.7)?Math.sin(t*90)*.55+offset:offset;return new THREE.Vector3(x,y,z)}
+let running=true;document.getElementById('toggle').onclick=()=>{running=!running;document.getElementById('toggle').textContent=running?'Pause flow':'Resume flow'};document.getElementById('reset').onclick=()=>{camera.position.set(5.8,4.2,7.2);controls.target.set(0,.15,0)};
+// UI zone readout: conceptual values only
+const zui=document.getElementById('zones');zones.forEach((z,i)=>{const el=document.createElement('div');el.className='zone';el.innerHTML=`<div class="row"><span>ZONE ${i+1} · ${z.sensor}</span><b>${Math.round(z.flow*100)}%</b></div><div class="bar"><i style="width:${z.flow*100}%"></i></div>`;el.onclick=()=>{controls.target.set(0,z.y,0);camera.position.set(4.2,z.y+1.7,5.4)};zui.appendChild(el)});
+const tip=document.getElementById('tooltip');const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();renderer.domElement.addEventListener('pointermove',e=>{mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight*2-1);ray.setFromCamera(mouse,camera);const hits=ray.intersectObjects(zones.map(z=>z.sensor));if(hits.length){tip.style.display='block';tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY+12)+'px';tip.textContent='Sealed optical sensor interface'}else tip.style.display='none'});
+let clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const dt=clock.getDelta();controls.update();if(running){particles.forEach(p=>{p.userData.t=(p.userData.t+dt*.055)%1;p.position.copy(flowPoint(p.userData.t,p.userData.offset))});zones.forEach((z,i)=>{z.lines.material.opacity=.28+.16*Math.sin(performance.now()*.002+i);z.sensor.material.emissiveIntensity=.55+.35*Math.sin(performance.now()*.003+i)});}renderer.render(scene,camera)}animate();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 </script>
-</body>
-</html>
+</body></html>
