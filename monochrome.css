@@ -1,2 +1,13 @@
-html,body{filter:grayscale(1) contrast(1.08)}
-canvas{filter:grayscale(1) contrast(1.12)}
+/* Monochrome technical UI inspired by the AEGIS-BIO-NODE reference interface. */
+:root{--bg:#0a0a0a!important;--panel:rgba(12,12,12,.94)!important;--line:rgba(255,255,255,.18)!important;--text:#f0f0f0!important;--muted:#9a9a9a!important;--cyan:#fff!important;--green:#fff!important;--amber:#fff!important}
+html,body{background:#0a0a0a!important;color:#f0f0f0!important;font-family:"SF Mono","Roboto Mono",ui-monospace,Menlo,Consolas,monospace!important}
+canvas{filter:grayscale(1) contrast(1.12) brightness(.96)}
+.panel{background:rgba(12,12,12,.94)!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:2px!important;box-shadow:none!important;backdrop-filter:blur(12px)}
+.brand,.sub,.footer,.legend,.controls,.controls button,.panel h2,.row{color:#9a9a9a!important}
+.brand{letter-spacing:.14em;text-transform:uppercase}.brand strong{color:#f0f0f0!important}
+.badge{border-color:rgba(255,255,255,.4)!important;color:#fff!important;background:rgba(255,255,255,.06)!important;border-radius:2px!important}
+.panel h2{letter-spacing:.12em;text-transform:uppercase}.zone{border-top-color:rgba(255,255,255,.12)!important}.row b{color:#fff!important}
+.bar{background:#222!important}.bar i{background:#fff!important}.controls{border-top-color:rgba(255,255,255,.14)!important}
+.controls button{background:transparent!important;border-color:rgba(255,255,255,.18)!important;color:#f0f0f0!important;border-radius:2px!important}.controls button:hover{background:#fff!important;color:#000!important;border-color:#fff!important}
+.legend{background:rgba(10,10,10,.9)!important;border-color:rgba(255,255,255,.18)!important}.dot,.dot.g{background:#fff!important}
+#tooltip{background:#000!important;color:#fff!important;border-color:rgba(255,255,255,.4)!important;border-radius:2px!important}.footer{letter-spacing:.1em}
