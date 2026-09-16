@@ -11,6 +11,7 @@
 .panel{position:fixed;right:18px;top:18px;width:285px;padding:14px;z-index:6;border:1px solid var(--line);border-radius:12px;background:var(--panel);backdrop-filter:blur(12px);box-shadow:0 18px 50px rgba(0,0,0,.4)}.panel h2{margin:0 0 9px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#a9c7cb}.zone{padding:9px 0;border-top:1px solid #1e343a;cursor:pointer}.zone:first-of-type{border-top:0}.row{display:flex;justify-content:space-between;font-size:11px}.row b{color:var(--cyan)}.bar{height:3px;margin-top:7px;background:#13252a;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;border-radius:9px;background:var(--cyan)}.controls{margin-top:10px;padding-top:10px;border-top:1px solid #20363b;font-size:9px;color:var(--muted);line-height:1.55}.controls button{pointer-events:auto;margin:4px 4px 0 0;padding:6px 8px;background:#0b2025;border:1px solid #31525a;border-radius:6px;color:#c5eff1;cursor:pointer}.controls button:hover{border-color:var(--cyan)}
 .legend{position:fixed;left:18px;bottom:18px;z-index:6;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:rgba(5,13,17,.86);font-size:9px;color:var(--muted);line-height:1.8}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;background:var(--cyan)}.dot.g{background:var(--green)}#tooltip{position:fixed;z-index:8;display:none;padding:8px 10px;border:1px solid #3b6970;border-radius:7px;background:#071519;color:#dffcff;font-size:10px;pointer-events:none}.footer{position:fixed;right:18px;bottom:18px;z-index:6;color:#647f85;font-size:9px;letter-spacing:.08em;text-transform:uppercase}@media(max-width:700px){.panel{width:225px;right:9px;top:9px}.top{left:9px;top:9px}.brand{font-size:15px}.sub{max-width:210px;line-height:1.5}.legend{left:9px;bottom:9px}.footer{display:none}}
 </style>
+<link rel="stylesheet" href="monochrome.css">
 </head>
 <body>
 <div id="app"></div>
@@ -39,28 +40,21 @@ const zoneMats=[0x4bcbd2,0x79e9b0,0xffb35f,0xb995ff];
 function tube(points,r,mat=branchMat){const curve=new THREE.CatmullRomCurve3(points);const mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,48,r,10,false),mat);root.add(mesh);return {curve,mesh}}
 function lobe(x,scaleY,scaleX){const geo=new THREE.SphereGeometry(1,48,32);const mesh=new THREE.Mesh(geo,tissueMat);mesh.scale.set(scaleX,scaleY,.92);mesh.position.set(x,0,0);root.add(mesh);const rim=new THREE.Mesh(new THREE.SphereGeometry(1.02,32,20),new THREE.MeshBasicMaterial({color:0x7be0e2,wireframe:true,transparent:true,opacity:.08}));rim.scale.copy(mesh.scale);rim.position.copy(mesh.position);root.add(rim);return mesh}
 lobe(-1.18,2.18,1.23);lobe(1.18,2.18,1.23);
-// outer transparent vessel follows the two-lobe silhouette
 const chamber=new THREE.Mesh(new THREE.SphereGeometry(1,48,28),shellMat);chamber.scale.set(2.75,2.48,1.42);root.add(chamber);
-// central trachea / inlet and carina
 const tr=tube([new THREE.Vector3(0,2.95,0),new THREE.Vector3(0,1.65,0),new THREE.Vector3(0,.95,0)],.16,frameMat);
 const leftMain=tube([new THREE.Vector3(0,.98,0),new THREE.Vector3(-.42,.55,0),new THREE.Vector3(-1.0,.25,0),new THREE.Vector3(-1.55,.05,0)],.105,branchMat);
 const rightMain=tube([new THREE.Vector3(0,.98,0),new THREE.Vector3(.42,.55,0),new THREE.Vector3(1.0,.25,0),new THREE.Vector3(1.55,.05,0)],.105,branchMat);
 const paths=[tr,leftMain,rightMain];
-// branching trees, deliberately schematic rather than anatomical
 const branches=[];const branchDefs=[[-1,[-1.55,.05,0]],[1,[1.55,.05,0]]];
 for(const side of [-1,1]){
  const base=side===-1?new THREE.Vector3(-1.45,.05,0):new THREE.Vector3(1.45,.05,0);
  const levels=[[-.35,.9,-.05,.48],[-.55,.1,.18,.72],[-.42,-.78,-.22,.9],[-.1,-1.35,-.1,.8]];
  levels.forEach((d,j)=>{const end=new THREE.Vector3(side*d[0]+(side<0?-.05:.05),d[1],d[2]);const p=tube([base.clone(),new THREE.Vector3((base.x+end.x)/2,d[1]+.12,(base.z+end.z)/2),end],d[3]*.065,branchMat);branches.push(p);paths.push(p);for(let k=0;k<2;k++){const ex=end.clone();ex.x+=side*(.42+.14*j);ex.y+=k?.32:-.3;ex.z+=(k?.28:-.28)*(j%2?1:-1);const q=tube([end.clone(),new THREE.Vector3((end.x+ex.x)/2,ex.y,(end.z+ex.z)/2),ex],.038,branchMat);branches.push(q);paths.push(q);}})
 }
-// four conceptual spatial cores embedded in the lobes
 const zones=[];const zonePos=[[-1.25,.95,.02],[-1.25,-.95,.02],[1.25,.95,.02],[1.25,-.95,.02]];
 zonePos.forEach((p,i)=>{const group=new THREE.Group();group.position.set(...p);const mat=new THREE.MeshStandardMaterial({color:zoneMats[i],transparent:true,opacity:.56,roughness:.35,emissive:zoneMats[i],emissiveIntensity:.18});const core=new THREE.Mesh(new THREE.IcosahedronGeometry(.53,2),mat);core.scale.set(1,.78,.72);group.add(core);const wire=new THREE.Mesh(new THREE.IcosahedronGeometry(.56,2),new THREE.MeshBasicMaterial({color:zoneMats[i],wireframe:true,transparent:true,opacity:.32}));group.add(wire);const ring=new THREE.Mesh(new THREE.TorusGeometry(.57,.025,8,40),frameMat);ring.rotation.x=Math.PI/2;group.add(ring);root.add(group);const inlet=new THREE.Vector3(p[0],p[1],.02);const from=new THREE.Vector3(p[0]+(p[0]<0?.55:-.55),p[1]+(p[1]>.5?-.15:.15),0);const route=tube([from,new THREE.Vector3(p[0]+(p[0]<0?.2:-.2),p[1],0),inlet],.055,branchMat);const valve=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,.09,20),valveMat);valve.rotation.z=Math.PI/2;valve.position.copy(from);root.add(valve);const sensor=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,.14,18),sensorMat);sensor.rotation.x=Math.PI/2;sensor.position.set(p[0],p[1],.67);root.add(sensor);zones.push({group,core,wire,sensor,route,flow:.58+i*.07,name:['Upper left','Lower left','Upper right','Lower right'][i],measure:['O₂','pH','Temperature','Pressure'][i]})});
-// sealed front optical cassette, mounted without opening the chamber
 const cassette=new THREE.Mesh(new THREE.BoxGeometry(.38,2.65,.12),new THREE.MeshStandardMaterial({color:0x173b3f,transparent:true,opacity:.92,metalness:.5,roughness:.2}));cassette.position.set(0,-.05,1.33);root.add(cassette);const cassetteRing=new THREE.Mesh(new THREE.TorusGeometry(.23,.025,8,36),sensorMat);cassetteRing.position.set(0,2.93,1.33);cassetteRing.rotation.x=Math.PI/2;root.add(cassetteRing);
-// lower outlet manifold
 const outlet=tube([new THREE.Vector3(-.2,-2.2,0),new THREE.Vector3(0,-2.55,0),new THREE.Vector3(.2,-2.2,0)],.12,frameMat);paths.push(outlet);
-// particle samples along the main paths and zone routes
 const particleGeo=new THREE.SphereGeometry(.032,8,8),particles=[];for(let i=0;i<90;i++){const p=new THREE.Mesh(particleGeo,flowMat);p.userData.t=Math.random();p.userData.path=paths[i%paths.length];root.add(p);particles.push(p)}
 let running=true;document.getElementById('toggle').onclick=()=>{running=!running;document.getElementById('toggle').textContent=running?'Pause flow':'Resume flow'};document.getElementById('reset').onclick=()=>{camera.position.set(5.8,1.1,8.4);controls.target.set(0,.15,0)};
 const ui=document.getElementById('zones');zones.forEach((z,i)=>{const el=document.createElement('div');el.className='zone';el.innerHTML=`<div class="row"><span>ZONE ${i+1} · ${z.name} · ${z.measure}</span><b>${Math.round(z.flow*100)}%</b></div><div class="bar"><i style="width:${z.flow*100}%"></i></div>`;el.onclick=()=>{controls.target.copy(z.group.position);camera.position.set(z.group.position.x+3,z.group.position.y+.8,5.2)};ui.appendChild(el)});
