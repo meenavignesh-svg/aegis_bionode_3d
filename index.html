@@ -3,67 +3,69 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>AEGIS Bio-Node | Adaptive Perfusion Cartridge</title>
+<title>AEGIS Bio-Node | Lung-Inspired Perfusion Architecture</title>
 <style>
-:root{--bg:#071014;--panel:rgba(9,20,24,.88);--line:#31525a;--text:#d9eef0;--muted:#7fa0a5;--cyan:#52e3e8;--green:#8dffbd;--amber:#ffd27a}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:Inter,system-ui,Segoe UI,sans-serif;color:var(--text)}
-#app{position:fixed;inset:0}canvas{display:block;width:100%;height:100%}
-.hud{position:fixed;z-index:3;pointer-events:none}.top{top:18px;left:18px}.brand{font-size:19px;font-weight:800;letter-spacing:.18em}.sub{margin-top:5px;color:var(--muted);font-size:10px;letter-spacing:.16em;text-transform:uppercase}.badge{display:inline-block;margin-top:10px;padding:5px 8px;border:1px solid #805f2b;border-radius:5px;color:var(--amber);font-size:9px;letter-spacing:.12em;background:rgba(70,45,10,.25)}
-.panel{position:fixed;z-index:4;right:18px;top:18px;width:270px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);backdrop-filter:blur(12px);box-shadow:0 18px 50px rgba(0,0,0,.35)}.panel h2{margin:0 0 10px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#a9c6ca}.zone{padding:9px 0;border-top:1px solid #20363b;cursor:pointer}.zone:first-of-type{border-top:0}.row{display:flex;justify-content:space-between;gap:10px;font-size:11px}.row b{color:var(--cyan)}.bar{height:3px;margin-top:7px;background:#16282d;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--cyan);border-radius:9px}.controls{margin-top:10px;padding-top:10px;border-top:1px solid #20363b;font-size:10px;color:var(--muted);line-height:1.55}.controls button{pointer-events:auto;margin:3px 4px 0 0;padding:6px 8px;background:#0d2025;border:1px solid #31525a;border-radius:6px;color:#bfecef;cursor:pointer}.controls button:hover{border-color:var(--cyan)}
-.legend{position:fixed;left:18px;bottom:18px;z-index:4;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:rgba(7,16,20,.82);font-size:9px;color:var(--muted);line-height:1.8}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;background:var(--cyan)}.dot.g{background:var(--green)}
-#tooltip{position:fixed;z-index:6;display:none;padding:8px 10px;border:1px solid #3b6970;border-radius:7px;background:#071519;color:#dffcff;font-size:10px;pointer-events:none}.footer{position:fixed;z-index:4;right:18px;bottom:18px;color:#6f898e;font-size:9px;letter-spacing:.08em;text-transform:uppercase}
-@media(max-width:700px){.panel{width:220px;right:10px;top:10px}.top{left:10px;top:10px}.brand{font-size:15px}.legend{left:10px;bottom:10px}.footer{display:none}.panel .zone{padding:6px 0}}
+:root{--bg:#050d11;--panel:rgba(8,19,24,.9);--line:#29464e;--text:#d9f1f3;--muted:#78979d;--cyan:#54e5eb;--green:#91ffc1;--amber:#ffd17b}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:Inter,system-ui,Segoe UI,sans-serif;color:var(--text)}#app{position:fixed;inset:0}canvas{display:block;width:100%;height:100%}
+.hud{position:fixed;z-index:5;pointer-events:none}.top{left:18px;top:18px}.brand{font-size:19px;font-weight:800;letter-spacing:.18em}.sub{margin-top:5px;color:var(--muted);font-size:10px;letter-spacing:.14em;text-transform:uppercase}.badge{display:inline-block;margin-top:10px;padding:5px 8px;border:1px solid #76592a;border-radius:5px;color:var(--amber);font-size:9px;letter-spacing:.1em;background:rgba(70,45,10,.24)}
+.panel{position:fixed;right:18px;top:18px;width:285px;padding:14px;z-index:6;border:1px solid var(--line);border-radius:12px;background:var(--panel);backdrop-filter:blur(12px);box-shadow:0 18px 50px rgba(0,0,0,.4)}.panel h2{margin:0 0 9px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#a9c7cb}.zone{padding:9px 0;border-top:1px solid #1e343a;cursor:pointer}.zone:first-of-type{border-top:0}.row{display:flex;justify-content:space-between;font-size:11px}.row b{color:var(--cyan)}.bar{height:3px;margin-top:7px;background:#13252a;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;border-radius:9px;background:var(--cyan)}.controls{margin-top:10px;padding-top:10px;border-top:1px solid #20363b;font-size:9px;color:var(--muted);line-height:1.55}.controls button{pointer-events:auto;margin:4px 4px 0 0;padding:6px 8px;background:#0b2025;border:1px solid #31525a;border-radius:6px;color:#c5eff1;cursor:pointer}.controls button:hover{border-color:var(--cyan)}
+.legend{position:fixed;left:18px;bottom:18px;z-index:6;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:rgba(5,13,17,.86);font-size:9px;color:var(--muted);line-height:1.8}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;background:var(--cyan)}.dot.g{background:var(--green)}#tooltip{position:fixed;z-index:8;display:none;padding:8px 10px;border:1px solid #3b6970;border-radius:7px;background:#071519;color:#dffcff;font-size:10px;pointer-events:none}.footer{position:fixed;right:18px;bottom:18px;z-index:6;color:#647f85;font-size:9px;letter-spacing:.08em;text-transform:uppercase}@media(max-width:700px){.panel{width:225px;right:9px;top:9px}.top{left:9px;top:9px}.brand{font-size:15px}.sub{max-width:210px;line-height:1.5}.legend{left:9px;bottom:9px}.footer{display:none}}
 </style>
 </head>
 <body>
 <div id="app"></div>
-<div class="hud top"><div class="brand">AEGIS BIO-NODE</div><div class="sub">Adaptive sterile perfusion cartridge · technical concept</div><div class="badge">CONCEPTUAL · NOT EXPERIMENTALLY VALIDATED</div></div>
-<div class="panel">
-<h2>Spatial control architecture</h2>
-<div id="zones"></div>
-<div class="controls">FLOW PATH: inlet manifold → zone restrictors → graded gyroid cores → outlet manifold<br><button id="toggle">Pause flow</button><button id="reset">Reset view</button></div>
-</div>
-<div class="legend"><div><span class="dot"></span>Perfusion path</div><div><span class="dot g"></span>Sensor interface</div><div>Drag: rotate · Wheel: zoom · Tap zone: inspect</div></div>
-<div class="footer">AEGIS / engineering visualization / no performance claims</div><div id="tooltip"></div>
+<div class="hud top"><div class="brand">AEGIS BIO-NODE</div><div class="sub">Lung-inspired adaptive sterile perfusion cartridge · technical concept</div><div class="badge">CONCEPTUAL · NOT EXPERIMENTALLY VALIDATED</div></div>
+<div class="panel"><h2>Four-zone spatial architecture</h2><div id="zones"></div><div class="controls">FLOW PATH: central inlet → bronchial-style branches → zone restrictors → spatial cores → outlet manifold<br><button id="toggle">Pause flow</button><button id="reset">Reset view</button></div></div>
+<div class="legend"><div><span class="dot"></span>Conceptual perfusion path</div><div><span class="dot g"></span>Sealed optical sensor interface</div><div>Drag: rotate · Wheel: zoom · Tap zone: inspect</div></div>
+<div class="footer">LUNG-INSPIRED ARCHITECTURE / NO PERFORMANCE CLAIMS</div><div id="tooltip"></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x071014);scene.fog=new THREE.Fog(0x071014,8,18);
-const camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.05,40);camera.position.set(5.8,4.2,7.2);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x050d11);scene.fog=new THREE.Fog(0x050d11,8,18);
+const camera=new THREE.PerspectiveCamera(34,innerWidth/innerHeight,.05,40);camera.position.set(5.8,1.1,8.4);
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;document.getElementById('app').appendChild(renderer.domElement);
-const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.minDistance=4;controls.maxDistance=12;controls.target.set(0,.15,0);
-scene.add(new THREE.HemisphereLight(0x9ddfe5,0x081014,2.0));const key=new THREE.DirectionalLight(0xb8ffff,3);key.position.set(4,7,5);scene.add(key);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.minDistance=4.5;controls.maxDistance=12;controls.target.set(0,.15,0);
+scene.add(new THREE.HemisphereLight(0xa9e9ee,0x050a0c,2));const key=new THREE.DirectionalLight(0xb9ffff,3.1);key.position.set(4,5,7);scene.add(key);const fill=new THREE.PointLight(0x4de1e7,2.2,12);fill.position.set(0,0,3);scene.add(fill);
 const root=new THREE.Group();scene.add(root);
-const matShell=new THREE.MeshStandardMaterial({color:0x173138,metalness:.55,roughness:.3,transparent:true,opacity:.26,side:THREE.DoubleSide});
-const matFrame=new THREE.MeshStandardMaterial({color:0x274850,metalness:.75,roughness:.25});
-const matCore=new THREE.MeshStandardMaterial({color:0x286a72,metalness:.15,roughness:.38,transparent:true,opacity:.82,emissive:0x082b30,emissiveIntensity:.7});
-const matFlow=new THREE.MeshBasicMaterial({color:0x52e3e8});const matSensor=new THREE.MeshStandardMaterial({color:0x8dffbd,metalness:.4,roughness:.2,emissive:0x123d2b,emissiveIntensity:.8});
-const matValve=new THREE.MeshStandardMaterial({color:0xffb85c,metalness:.7,roughness:.25});
-// transparent chamber
-const chamber=new THREE.Mesh(new THREE.CylinderGeometry(1.55,1.55,4.7,64,1,true),matShell);chamber.position.y=.1;root.add(chamber);
-for(const y of [-2.25,-1.1,0.05,1.2,2.35]){const r=new THREE.Mesh(new THREE.TorusGeometry(1.55,.055,10,64),matFrame);r.rotation.x=Math.PI/2;r.position.y=y;root.add(r)}
-// four spatially distinct graded gyroid zones
-const zones=[];const zoneYs=[-1.55,-.52,.52,1.55];
-function gyroidGeometry(y,scale,phase){const pts=[];const seg=190;for(let i=0;i<seg;i++){const t=i/(seg-1);const yy=-.39+t*.78;const rad=.82*(.72+.28*Math.sin(t*Math.PI));for(let j=0;j<28;j++){const a=j/28*Math.PI*2+phase;const x=Math.cos(a)*rad*(.9+.1*Math.sin(t*9));const z=Math.sin(a)*rad*(.9+.1*Math.cos(t*8));pts.push(x,yy*scale,z)}}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));return g}
-zoneYs.forEach((y,i)=>{const g=gyroidGeometry(y,1, i*.55);const m=new THREE.LineBasicMaterial({color:0x4cced5,transparent:true,opacity:.42});const lines=new THREE.LineSegments(g,m);lines.position.y=y;root.add(lines);const ring=new THREE.Mesh(new THREE.TorusGeometry(.98,.035,8,48),matFrame);ring.rotation.x=Math.PI/2;ring.position.y=y-.42;root.add(ring);zones.push({y,lines,flow:.55+i*.08,sensor:i%2?'pH':'O₂'})});
-// inlet/outlet manifolds on opposite sides
-function pipe(a,b,r=.09,mat=matFlow){const d=new THREE.Vector3().subVectors(b,a);const mid=new THREE.Vector3().addVectors(a,b).multiplyScalar(.5);const mesh=new THREE.Mesh(new THREE.CylinderGeometry(r,r,d.length(),16),mat);mesh.position.copy(mid);mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());root.add(mesh);return mesh}
-const inlet=new THREE.Vector3(-2.5,-1.55,0), outlet=new THREE.Vector3(2.5,1.55,0);pipe(inlet,new THREE.Vector3(-1.05,-1.55,0),.13,matFrame);pipe(new THREE.Vector3(1.05,1.55,0),outlet,.13,matFrame);
-// vertical manifolds and zone restrictors
-pipe(new THREE.Vector3(-1.05,-1.55,0),new THREE.Vector3(-1.05,1.55,0),.12,matFrame);pipe(new THREE.Vector3(1.05,-1.55,0),new THREE.Vector3(1.05,1.55,0),.12,matFrame);
-zones.forEach((z,i)=>{pipe(new THREE.Vector3(-1.05,z.y,0),new THREE.Vector3(-.78,z.y,0),.07,matFrame);pipe(new THREE.Vector3(.78,z.y,0),new THREE.Vector3(1.05,z.y,0),.07,matFrame);const v=new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,.08,20),matValve);v.rotation.z=Math.PI/2;v.position.set(-.92,z.y,0);root.add(v);z.valve=v});
-// sealed replaceable optical sensor cassette at front
-const cassette=new THREE.Mesh(new THREE.BoxGeometry(.55,2.9,.12),new THREE.MeshStandardMaterial({color:0x193e42,metalness:.5,roughness:.2,transparent:true,opacity:.9}));cassette.position.set(0,0,1.45);root.add(cassette);
-for(let i=0;i<4;i++){const s=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,.15,18),matSensor);s.rotation.x=Math.PI/2;s.position.set(0,zoneYs[i],1.53);root.add(s);zones[i].sensor=s}
-// flow particles travel through the complete architecture
-const particleGeo=new THREE.SphereGeometry(.035,8,8);const particles=[];for(let i=0;i<70;i++){const p=new THREE.Mesh(particleGeo,matFlow);p.userData.t=Math.random();p.userData.offset=(Math.random()-.5)*.13;root.add(p);particles.push(p)}
-function flowPoint(t,offset){const stages=[0,.16,.3,.7,.84,1];let y;if(t<.16){y=-1.55}else if(t<.3){y=-1.55+(t-.16)/.14*3.1}else if(t<.7){const q=(t-.3)/.4;const idx=Math.min(3,Math.floor(q*4));const local=q*4-idx;y=zoneYs[idx]*(1-local)+zoneYs[Math.min(3,idx+1)]*local}else if(t<.84){y=1.55}else y=1.55;let x;if(t<.16)x=-2.5+(t/.16)*1.45;else if(t<.3)x=-1.05;else if(t<.7)x=-.78;else if(t<.84)x=1.05;else x=1.05+(t-.84)/.16*1.45;const z=(t>.3&&t<.7)?Math.sin(t*90)*.55+offset:offset;return new THREE.Vector3(x,y,z)}
-let running=true;document.getElementById('toggle').onclick=()=>{running=!running;document.getElementById('toggle').textContent=running?'Pause flow':'Resume flow'};document.getElementById('reset').onclick=()=>{camera.position.set(5.8,4.2,7.2);controls.target.set(0,.15,0)};
-// UI zone readout: conceptual values only
-const zui=document.getElementById('zones');zones.forEach((z,i)=>{const el=document.createElement('div');el.className='zone';el.innerHTML=`<div class="row"><span>ZONE ${i+1} · ${z.sensor}</span><b>${Math.round(z.flow*100)}%</b></div><div class="bar"><i style="width:${z.flow*100}%"></i></div>`;el.onclick=()=>{controls.target.set(0,z.y,0);camera.position.set(4.2,z.y+1.7,5.4)};zui.appendChild(el)});
-const tip=document.getElementById('tooltip');const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();renderer.domElement.addEventListener('pointermove',e=>{mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight*2-1);ray.setFromCamera(mouse,camera);const hits=ray.intersectObjects(zones.map(z=>z.sensor));if(hits.length){tip.style.display='block';tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY+12)+'px';tip.textContent='Sealed optical sensor interface'}else tip.style.display='none'});
-let clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const dt=clock.getDelta();controls.update();if(running){particles.forEach(p=>{p.userData.t=(p.userData.t+dt*.055)%1;p.position.copy(flowPoint(p.userData.t,p.userData.offset))});zones.forEach((z,i)=>{z.lines.material.opacity=.28+.16*Math.sin(performance.now()*.002+i);z.sensor.material.emissiveIntensity=.55+.35*Math.sin(performance.now()*.003+i)});}renderer.render(scene,camera)}animate();
+const shellMat=new THREE.MeshPhysicalMaterial({color:0x183238,transparent:true,opacity:.16,roughness:.18,metalness:.25,side:THREE.DoubleSide});
+const tissueMat=new THREE.MeshPhysicalMaterial({color:0x4d7f85,transparent:true,opacity:.33,roughness:.48,metalness:.05,emissive:0x08292d,emissiveIntensity:.55,side:THREE.DoubleSide});
+const branchMat=new THREE.MeshStandardMaterial({color:0x5bcbd0,transparent:true,opacity:.72,roughness:.28,metalness:.15,emissive:0x082d31,emissiveIntensity:.65});
+const frameMat=new THREE.MeshStandardMaterial({color:0x31565d,metalness:.72,roughness:.22});
+const flowMat=new THREE.MeshBasicMaterial({color:0x54e5eb});
+const sensorMat=new THREE.MeshStandardMaterial({color:0x91ffc1,metalness:.35,roughness:.2,emissive:0x155d3b,emissiveIntensity:.8});
+const valveMat=new THREE.MeshStandardMaterial({color:0xffb95d,metalness:.72,roughness:.22});
+const zoneMats=[0x4bcbd2,0x79e9b0,0xffb35f,0xb995ff];
+function tube(points,r,mat=branchMat){const curve=new THREE.CatmullRomCurve3(points);const mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,48,r,10,false),mat);root.add(mesh);return {curve,mesh}}
+function lobe(x,scaleY,scaleX){const geo=new THREE.SphereGeometry(1,48,32);const mesh=new THREE.Mesh(geo,tissueMat);mesh.scale.set(scaleX,scaleY,.92);mesh.position.set(x,0,0);root.add(mesh);const rim=new THREE.Mesh(new THREE.SphereGeometry(1.02,32,20),new THREE.MeshBasicMaterial({color:0x7be0e2,wireframe:true,transparent:true,opacity:.08}));rim.scale.copy(mesh.scale);rim.position.copy(mesh.position);root.add(rim);return mesh}
+lobe(-1.18,2.18,1.23);lobe(1.18,2.18,1.23);
+// outer transparent vessel follows the two-lobe silhouette
+const chamber=new THREE.Mesh(new THREE.SphereGeometry(1,48,28),shellMat);chamber.scale.set(2.75,2.48,1.42);root.add(chamber);
+// central trachea / inlet and carina
+const tr=tube([new THREE.Vector3(0,2.95,0),new THREE.Vector3(0,1.65,0),new THREE.Vector3(0,.95,0)],.16,frameMat);
+const leftMain=tube([new THREE.Vector3(0,.98,0),new THREE.Vector3(-.42,.55,0),new THREE.Vector3(-1.0,.25,0),new THREE.Vector3(-1.55,.05,0)],.105,branchMat);
+const rightMain=tube([new THREE.Vector3(0,.98,0),new THREE.Vector3(.42,.55,0),new THREE.Vector3(1.0,.25,0),new THREE.Vector3(1.55,.05,0)],.105,branchMat);
+const paths=[tr,leftMain,rightMain];
+// branching trees, deliberately schematic rather than anatomical
+const branches=[];const branchDefs=[[-1,[-1.55,.05,0]],[1,[1.55,.05,0]]];
+for(const side of [-1,1]){
+ const base=side===-1?new THREE.Vector3(-1.45,.05,0):new THREE.Vector3(1.45,.05,0);
+ const levels=[[-.35,.9,-.05,.48],[-.55,.1,.18,.72],[-.42,-.78,-.22,.9],[-.1,-1.35,-.1,.8]];
+ levels.forEach((d,j)=>{const end=new THREE.Vector3(side*d[0]+(side<0?-.05:.05),d[1],d[2]);const p=tube([base.clone(),new THREE.Vector3((base.x+end.x)/2,d[1]+.12,(base.z+end.z)/2),end],d[3]*.065,branchMat);branches.push(p);paths.push(p);for(let k=0;k<2;k++){const ex=end.clone();ex.x+=side*(.42+.14*j);ex.y+=k?.32:-.3;ex.z+=(k?.28:-.28)*(j%2?1:-1);const q=tube([end.clone(),new THREE.Vector3((end.x+ex.x)/2,ex.y,(end.z+ex.z)/2),ex],.038,branchMat);branches.push(q);paths.push(q);}})
+}
+// four conceptual spatial cores embedded in the lobes
+const zones=[];const zonePos=[[-1.25,.95,.02],[-1.25,-.95,.02],[1.25,.95,.02],[1.25,-.95,.02]];
+zonePos.forEach((p,i)=>{const group=new THREE.Group();group.position.set(...p);const mat=new THREE.MeshStandardMaterial({color:zoneMats[i],transparent:true,opacity:.56,roughness:.35,emissive:zoneMats[i],emissiveIntensity:.18});const core=new THREE.Mesh(new THREE.IcosahedronGeometry(.53,2),mat);core.scale.set(1,.78,.72);group.add(core);const wire=new THREE.Mesh(new THREE.IcosahedronGeometry(.56,2),new THREE.MeshBasicMaterial({color:zoneMats[i],wireframe:true,transparent:true,opacity:.32}));group.add(wire);const ring=new THREE.Mesh(new THREE.TorusGeometry(.57,.025,8,40),frameMat);ring.rotation.x=Math.PI/2;group.add(ring);root.add(group);const inlet=new THREE.Vector3(p[0],p[1],.02);const from=new THREE.Vector3(p[0]+(p[0]<0?.55:-.55),p[1]+(p[1]>.5?-.15:.15),0);const route=tube([from,new THREE.Vector3(p[0]+(p[0]<0?.2:-.2),p[1],0),inlet],.055,branchMat);const valve=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,.09,20),valveMat);valve.rotation.z=Math.PI/2;valve.position.copy(from);root.add(valve);const sensor=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,.14,18),sensorMat);sensor.rotation.x=Math.PI/2;sensor.position.set(p[0],p[1],.67);root.add(sensor);zones.push({group,core,wire,sensor,route,flow:.58+i*.07,name:['Upper left','Lower left','Upper right','Lower right'][i],measure:['O₂','pH','Temperature','Pressure'][i]})});
+// sealed front optical cassette, mounted without opening the chamber
+const cassette=new THREE.Mesh(new THREE.BoxGeometry(.38,2.65,.12),new THREE.MeshStandardMaterial({color:0x173b3f,transparent:true,opacity:.92,metalness:.5,roughness:.2}));cassette.position.set(0,-.05,1.33);root.add(cassette);const cassetteRing=new THREE.Mesh(new THREE.TorusGeometry(.23,.025,8,36),sensorMat);cassetteRing.position.set(0,2.93,1.33);cassetteRing.rotation.x=Math.PI/2;root.add(cassetteRing);
+// lower outlet manifold
+const outlet=tube([new THREE.Vector3(-.2,-2.2,0),new THREE.Vector3(0,-2.55,0),new THREE.Vector3(.2,-2.2,0)],.12,frameMat);paths.push(outlet);
+// particle samples along the main paths and zone routes
+const particleGeo=new THREE.SphereGeometry(.032,8,8),particles=[];for(let i=0;i<90;i++){const p=new THREE.Mesh(particleGeo,flowMat);p.userData.t=Math.random();p.userData.path=paths[i%paths.length];root.add(p);particles.push(p)}
+let running=true;document.getElementById('toggle').onclick=()=>{running=!running;document.getElementById('toggle').textContent=running?'Pause flow':'Resume flow'};document.getElementById('reset').onclick=()=>{camera.position.set(5.8,1.1,8.4);controls.target.set(0,.15,0)};
+const ui=document.getElementById('zones');zones.forEach((z,i)=>{const el=document.createElement('div');el.className='zone';el.innerHTML=`<div class="row"><span>ZONE ${i+1} · ${z.name} · ${z.measure}</span><b>${Math.round(z.flow*100)}%</b></div><div class="bar"><i style="width:${z.flow*100}%"></i></div>`;el.onclick=()=>{controls.target.copy(z.group.position);camera.position.set(z.group.position.x+3,z.group.position.y+.8,5.2)};ui.appendChild(el)});
+const ray=new THREE.Raycaster(),mouse=new THREE.Vector2(),tip=document.getElementById('tooltip');renderer.domElement.addEventListener('pointermove',e=>{mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight*2-1);ray.setFromCamera(mouse,camera);const hits=ray.intersectObjects(zones.map(z=>z.sensor));if(hits.length){tip.style.display='block';tip.style.left=e.clientX+12+'px';tip.style.top=e.clientY+12+'px';tip.textContent='Sealed optical sensor interface'}else tip.style.display='none'});
+const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const dt=clock.getDelta();controls.update();if(running){particles.forEach(p=>{p.userData.t=(p.userData.t+dt*.12)%1;p.position.copy(p.userData.path.curve.getPointAt(p.userData.t))});zones.forEach((z,i)=>{z.core.rotation.y+=dt*(.15+i*.03);z.wire.rotation.y-=dt*.1;z.sensor.material.emissiveIntensity=.6+.35*Math.sin(performance.now()*.003+i)});}renderer.render(scene,camera)}animate();
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 </script>
 </body></html>
